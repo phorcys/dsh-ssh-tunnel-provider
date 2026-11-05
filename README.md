@@ -1,5 +1,7 @@
 # dsh-llm-ssh-tunnel
 
+[![CI](https://github.com/phorcys/dsh-ssh-tunnel-provider/actions/workflows/ci.yml/badge.svg)](https://github.com/phorcys/dsh-ssh-tunnel-provider/actions/workflows/ci.yml)
+
 An SSH-tunnelled, multi-protocol model provider for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), with a browser settings card.
 
 It exists for the common home-lab shape: **sub2api runs on the NAS, the NAS is not exposed to the public internet, and DSH may be running somewhere else.** The provider opens an in-process SSH forward and sends every model request to a loopback port, so sub2api never needs a public listener.
@@ -39,7 +41,7 @@ The trade-off is that `ssh2` does **not** read `~/.ssh/config`. Use explicit `ho
 From a clone of this repository:
 
 ```sh
-git clone <repository-url> dsh-llm-ssh-tunnel
+git clone https://github.com/phorcys/dsh-ssh-tunnel-provider.git dsh-llm-ssh-tunnel
 cd dsh-llm-ssh-tunnel
 npm ci
 npm run build

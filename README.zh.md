@@ -1,5 +1,7 @@
 # dsh-llm-ssh-tunnel
 
+[![CI](https://github.com/phorcys/dsh-ssh-tunnel-provider/actions/workflows/ci.yml/badge.svg)](https://github.com/phorcys/dsh-ssh-tunnel-provider/actions/workflows/ci.yml)
+
 给 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 用的 SSH 隧道模型 Provider，带浏览器设置卡片。
 
 它解决的是这个很常见的家庭网络场景：**sub2api 跑在 NAS 上，NAS 不暴露公网，DSH 却可能在另一台机器上。** 插件在 DSH 进程内建立 SSH 转发，把所有模型请求发到 `127.0.0.1` 的临时端口，sub2api 本身不需要监听公网。
@@ -36,24 +38,28 @@ DSH  ──►  127.0.0.1:<临时端口>  ──ssh2──►  NAS 127.0.0.1:808
 
 ## 安装
 
-在当前源码目录：
+从本仓库 clone 安装：
 
 ```sh
-pnpm install
-pnpm run build
-dsh plugin --profile web add link:/absolute/path/to/ssh-tunnel-provider
+git clone https://github.com/phorcys/dsh-ssh-tunnel-provider.git dsh-llm-ssh-tunnel
+cd dsh-llm-ssh-tunnel
+npm ci
+npm run build
+dsh plugin --profile web add link:$PWD
 ```
 
-或者打包后安装：
+也可以用 `npm install`；`npm ci` 使用仓库里的 lockfile，CI 走的就是它。`pnpm install` / `pnpm run build` 同样可用。
+
+或者打包后安装 tarball：
 
 ```sh
-pnpm pack
+npm pack
 dsh plugin --profile web add ./dsh-llm-ssh-tunnel-0.2.2.tgz
 ```
 
 包内已经包含构建好的 `lib/`（包括浏览器 bundle）。安装后重启或刷新 Web UI。
 
-`link:` 安装直接运行仓库里的 `lib/`，所以拉取改动后要重新 `pnpm run build` 并重启 `dsh web`——Host 半边每个进程只加载一次。
+`link:` 安装直接运行仓库里的 `lib/`，所以拉取改动后要重新 `npm run build` 并重启 `dsh web`——Host 半边每个进程只加载一次。
 
 ## 配置
 

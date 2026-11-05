@@ -6,8 +6,9 @@ Security fixes are made on the latest `0.2.x` release.
 
 ## Reporting a vulnerability
 
-Please use GitHub's **private vulnerability reporting** (Security → Report a
-vulnerability) rather than a public issue. Do not paste API keys, private keys,
+Please use GitHub's **private vulnerability reporting**
+(https://github.com/phorcys/dsh-ssh-tunnel-provider/security/advisories/new)
+rather than a public issue. Do not paste API keys, private keys,
 host names, or full `known_hosts` contents into an issue.
 
 Include the affected version, a minimal reproduction, and the impact. I will

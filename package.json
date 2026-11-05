@@ -79,5 +79,14 @@
       ],
       "platform": "web"
     }
+  },
+  "author": "phorcys",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phorcys/dsh-ssh-tunnel-provider.git"
+  },
+  "homepage": "https://github.com/phorcys/dsh-ssh-tunnel-provider#readme",
+  "bugs": {
+    "url": "https://github.com/phorcys/dsh-ssh-tunnel-provider/issues"
   }
 }
