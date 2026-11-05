@@ -12,6 +12,17 @@ The route is a normal `LlmAdapter`: model selection, tools, images, replay, reas
 
 Verified with DSH 0.2.1-rc.5 against a live sub2api deployment: discovery, streaming, all three wire protocols, and image input round-tripped through the tunnel. The automated suite uses an in-process `ssh2` server, so it needs no NAS credentials and no system `ssh`.
 
+## Project status
+
+`0.2.x` is a beta plugin. The transport, credential handling, discovery, settings card, and all three protocols are covered by the test suite and have been exercised against a live deployment. Interfaces may still change before `1.0`.
+
+## Requirements
+
+- DeepSeek Harness `0.2.1-rc.5` or a compatible build
+- Node.js `^22.19.0` or `>=24.0.0`
+- A Web profile for the settings card; the model route works without it
+- An SSH account that can reach sub2api's loopback listener
+
 ## Why in-process SSH?
 
 The transport is [`ssh2`](https://github.com/mscdex/ssh2), not the operating-system `ssh` command. That means:
@@ -25,18 +36,23 @@ The trade-off is that `ssh2` does **not** read `~/.ssh/config`. Use explicit `ho
 
 ## Install
 
-From this checkout:
+From a clone of this repository:
 
 ```sh
-pnpm install
-pnpm run build
-dsh plugin --profile web add link:/absolute/path/to/ssh-tunnel-provider
+git clone <repository-url> dsh-llm-ssh-tunnel
+cd dsh-llm-ssh-tunnel
+npm ci
+npm run build
+dsh plugin --profile web add link:$PWD
 ```
+
+`npm install` works too; `npm ci` uses the committed lockfile and is what CI
+runs. `pnpm install` / `pnpm run build` work as well.
 
 Or pack it and install the tarball:
 
 ```sh
-pnpm pack
+npm pack
 dsh plugin --profile web add ./dsh-llm-ssh-tunnel-0.2.2.tgz
 ```
 
@@ -304,11 +320,27 @@ The card writes `$DSH_HOME/.ssh-tunnel-provider.<provider>.json`, which override
 ## Development
 
 ```sh
-pnpm run build
-pnpm test
+npm ci
+npm run build
+npm test
 ```
 
+CI runs the same suite on Node 22 and Node 24. The suite is hermetic: it starts
+an in-process `ssh2.Server` and an HTTP mock, and needs no NAS.
+
 The integration test starts an in-process `ssh2.Server` implementing public-key auth and `direct-tcpip`, plus a mock OpenAI-compatible endpoint. It covers registration, discovery, streaming, `prepareCall`, host-key verification, and the settings route without touching a real SSH server.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, test expectations,
+and the privacy rules for examples and fixtures. The suite is intentionally
+hermetic, so a contribution does not need a real NAS to be reviewable.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for the security model and the private reporting
+path. Do not open a public issue containing an API key, private key, host name,
+or `known_hosts` contents.
 
 ## License
 

@@ -29,7 +29,10 @@
     "examples",
     "README.md",
     "README.zh.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "CONTRIBUTING.md"
   ],
   "engines": {
     "node": "^22.19.0 || >=24.0.0"

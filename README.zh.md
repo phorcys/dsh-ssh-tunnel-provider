@@ -12,6 +12,17 @@ DSH  ──►  127.0.0.1:<临时端口>  ──ssh2──►  NAS 127.0.0.1:808
 
 已在 DSH 0.2.1-rc.5 + 真实 sub2api 上验证：发现、流式输出、三种协议和图片输入都走通了隧道。自动化测试使用进程内 `ssh2.Server`，不需要 NAS 凭据，也不需要系统 `ssh`。
 
+## 项目状态
+
+`0.2.x` 是 beta 插件。传输、凭据处理、模型发现、设置卡片和三种协议都有测试覆盖，并在真实部署上跑过；`1.0` 之前接口仍可能调整。
+
+## 环境要求
+
+- DeepSeek Harness `0.2.1-rc.5` 或兼容版本
+- Node.js `^22.19.0` 或 `>=24.0.0`
+- 设置卡片需要 Web profile；模型路由本身不依赖它
+- 一个能访问 sub2api 回环监听的 SSH 账号
+
 ## 为什么用进程内 SSH
 
 传输层是 [`ssh2`](https://github.com/mscdex/ssh2)，不是操作系统自带的 `ssh` 命令。因此：
@@ -306,11 +317,22 @@ ssh -i ~/.ssh/id_ed25519 deploy@nas.example true
 ## 开发
 
 ```sh
-pnpm run build
-pnpm test
+npm ci
+npm run build
+npm test
 ```
 
+CI 在 Node 22 和 Node 24 上跑同一套测试。测试是自包含的：启动进程内 `ssh2.Server` 和 HTTP mock，不需要 NAS。
+
 集成测试会启动一个进程内 `ssh2.Server`（公钥认证 + `direct-tcpip`）和一个 mock OpenAI 兼容服务，覆盖注册、发现、流式输出、`prepareCall`、主机密钥校验和设置路由，不需要真实 SSH 服务器。
+
+## 贡献
+
+开发环境、测试要求和示例/测试数据的隐私规则见 [CONTRIBUTING.md](CONTRIBUTING.md)。测试刻意保持自包含，贡献者不需要真实 NAS 也能验证。
+
+## 安全
+
+安全模型和私密报告方式见 [SECURITY.md](SECURITY.md)。不要在公开 issue 里放 API Key、私钥、主机名或 `known_hosts` 内容。
 
 ## License
 
