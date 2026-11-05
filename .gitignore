@@ -1,0 +1,14 @@
+node_modules/
+vendor/
+.test-*/
+*.log
+*.tgz
+.npm-cache/
+.test-key
+.ssh_known_hosts_test
+*.out
+*.err
+web-cookies*.txt
+web-index*.html
+plugin-*.js
+settings-*.json

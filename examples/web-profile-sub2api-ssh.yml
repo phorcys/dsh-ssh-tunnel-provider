@@ -1,0 +1,78 @@
+# A drop-in migration of the common LAN sub2api route to an SSH-tunnelled one.
+#
+# Replace `nas`, `youruser`, and the key path with the NAS SSH facts. Keep the
+# existing `llm-pi-ai` route if you want a LAN fallback; the two routes have
+# different provider keys and do not collide.
+- insert:
+    - id: llm-sub2api-ssh
+      name: dsh-llm-ssh-tunnel
+      config:
+        provider: sub2api-ssh
+        displayName: Sub2API (SSH)
+        ssh:
+          host: nas
+          port: 22
+          user: youruser
+          identityFile: ~/.ssh/id_ed25519
+          knownHostsFile: ~/.ssh/known_hosts
+          strictHostKeyChecking: accept-new
+        remote:
+          host: 127.0.0.1
+          port: 8080
+          basePath: /v1
+        apiKeyEnv: SUB2API_API_KEY
+        api: openai-responses
+        discoverModels: true
+        compat:
+          thinkingFormat: openai
+          supportsReasoningEffort: true
+          supportsDeveloperRole: false
+          maxTokensField: max_tokens
+        models:
+          # The deployment advertises several spellings of V4.1 Flash
+          # (deepseek-v4-flash, deepseek-flash, prefixed variants, ...); this
+          # is the canonical id. Discovery collapses the rest.
+          - id: deepseek-v4.1-flash
+            name: DeepSeek V4.1 Flash
+            contextWindow: 1000000
+            maxTokens: 384000
+            input: [text, image]
+            reasoningEfforts:
+              low: low
+              high: high
+              max: max
+          - id: deepseek-v4-pro
+            name: DeepSeek-V4-Pro
+            contextWindow: 1000000
+            maxTokens: 384000
+            input: [text, image]
+            reasoningEfforts:
+              low: low
+              high: high
+              max: max
+          - id: glm-5.3-flash
+            name: GLM5.3 Flash
+            contextWindow: 1000000
+            maxTokens: 131072
+            input: [text, image]
+            reasoningEfforts:
+              off: none
+              low: low
+              high: high
+              max: max
+          - id: grok-4.6
+            name: Grok 4.6
+            contextWindow: 1000000
+            maxTokens: 131072
+            input: [text, image]
+            reasoningEfforts:
+              off: none
+              low: low
+              high: high
+              max: max
+
+- id: agent-default-model
+  config:
+    provider: sub2api-ssh
+    model: deepseek-v4.1-flash
+    reasoningEffort: max

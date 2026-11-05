@@ -1,0 +1,80 @@
+{
+  "name": "dsh-llm-ssh-tunnel",
+  "version": "0.2.2",
+  "description": "SSH-tunnelled multi-protocol model provider for DeepSeek Harness",
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "model-provider",
+    "ssh",
+    "tunnel",
+    "sub2api",
+    "anthropic"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "examples",
+    "README.md",
+    "README.zh.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.5",
+    "@deepseek-ai/cordis-plugin-loader": "~1.0.6",
+    "@deepseek-ai/dsh-attachment": "^0.2.1-rc.5",
+    "@deepseek-ai/dsh-credentials": "^0.2.1-rc.5",
+    "@deepseek-ai/dsh-home-paths": "^0.2.1-rc.5",
+    "@deepseek-ai/dsh-host-webserver": "^0.2.1-rc.5",
+    "@deepseek-ai/dsh-launch-environment": "^0.2.1-rc.5",
+    "@deepseek-ai/dsh-llm": "^0.2.1-rc.5",
+    "@deepseek-ai/dsh-llm-pi-ai": "^0.2.1-rc.5",
+    "@deepseek-ai/dsh-settings": "^0.2.1-rc.5",
+    "@deepseek-ai/schemastery": "^3.18.5",
+    "react": "^18.2.0"
+  },
+  "dependencies": {
+    "@earendil-works/pi-ai": "^1.1.0",
+    "ssh2": "^1.16.0"
+  },
+  "devDependencies": {
+    "@deepseek-ai/dsh-client-locale": "^0.2.1-rc.5",
+    "@deepseek-ai/dsh-client-ui-plugin-manager": "^0.2.1-rc.5",
+    "@deepseek-ai/dsh-client-ui-renderer": "^0.2.1-rc.5",
+    "@types/node": "^24.0.0",
+    "@types/ssh2": "^1.15.5",
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/build-client.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "prepack": "npm run build"
+  },
+  "license": "MIT",
+  "dsh": {
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-plugin-manager",
+        "@deepseek-ai/dsh-client-ui-renderer"
+      ],
+      "platform": "web"
+    }
+  }
+}

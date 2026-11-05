@@ -1,0 +1,34 @@
+# Add one SSH-tunnelled sub2api route beside the existing LAN route.
+# Replace `nas`, `youruser`, and the key path with the NAS SSH facts.
+# After the first boot, the Settings > Plugins card can edit these fields live.
+- insert:
+    - id: llm-sub2api-ssh
+      name: dsh-llm-ssh-tunnel
+      config:
+        provider: sub2api-ssh
+        displayName: Sub2API (SSH)
+        ssh:
+          host: nas
+          port: 22
+          user: youruser
+          identityFile: ~/.ssh/id_ed25519
+          knownHostsFile: ~/.ssh/known_hosts
+          strictHostKeyChecking: accept-new
+        remote:
+          host: 127.0.0.1
+          port: 8080
+          basePath: /v1
+        apiKeyEnv: SUB2API_API_KEY
+        api: openai-responses
+        discoverModels: true
+        defaults:
+          contextWindow: 262144
+          maxTokens: 32768
+          input: [text]
+
+# Optional: make the discovered route the default model.
+# The id must exist in /v1/models or in the route's explicit `models` list.
+- id: agent-default-model
+  config:
+    provider: sub2api-ssh
+    model: deepseek-v4.1-flash
