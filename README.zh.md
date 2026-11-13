@@ -299,6 +299,9 @@ ssh -i ~/.ssh/id_ed25519 deploy@nas.example true
 **Web 设置卡片不显示**
 浏览器半边只在 Web profile 里加载。确认包已安装到 profile，重启 `dsh web`，再看 **Settings → Plugins**。Host provider 在没有卡片时也能工作，只是没有 UI。
 
+**`dsh` 版本比插件旧**
+这个包面向 DSH `0.2.1-rc.5`；`0.2.1-rc.2` 这类旧 CLI 可能能组合 profile，却在启动时跳过插件。检查 `command -v dsh` 和 `dsh --version`，更新或重新指向全局 CLI，然后重启 Web 进程。正在运行的进程不会自动换版本。
+
 **模型显示 262k 上下文、输出很短、或没有图片支持**
 说明这个模型落到了路由默认值上，因为 sub2api 没有公布任何容量信息。检查 DSH 日志里的 `model facts — … from built-in families` 和 `N model(s) use route defaults` 警告；然后在 `models` 里声明它的 `contextWindow`、`maxTokens`、`input`。内置表里已收录的家族不用手动写。
 

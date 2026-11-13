@@ -298,6 +298,9 @@ Use a normal path such as `C:\Users\me\.ssh\id_ed25519`. `agent: true` tries Pag
 **Web card is missing**
 The browser half is loaded only in the Web profile. Confirm the package is installed in the profile, restart `dsh web`, and check **Settings → Plugins**. The host provider works without the card; only the UI is absent.
 
+**`dsh` is an older build than the plugin**
+This package targets DSH `0.2.1-rc.5`; an older CLI such as `0.2.1-rc.2` can make the profile compose but skip the plugin at boot. Check `command -v dsh` and `dsh --version`, then update or repoint the global CLI and restart the Web process. The running process keeps the version it was started with.
+
 **A model shows 262k context, short output, or no image support**
 That model fell through to the route defaults, because sub2api publishes no capacities. Check the DSH log line `model facts — … from built-in families` and the `N model(s) use route defaults` warning; declare the model under `models` with `contextWindow`, `maxTokens`, and `input`. Families listed in the built-in table are already handled.
 
