@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3
+
+- Add GPT-6 Astra / 6.1 Sol reasoning levels (`low`, `medium`, `high`,
+  `xhigh`, `max`) and the full GPT-6 Sol / Luna / 6.1 Terra / GPT-5.6 set
+  (including `off` and `minimal`), as accepted by the tested gateway.
+
 ## 0.2.2
 
 - Collapse the seven advertised DeepSeek V4.1 Flash ids to the canonical

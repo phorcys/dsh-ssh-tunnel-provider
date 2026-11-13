@@ -55,7 +55,7 @@ Or pack it and install the tarball:
 
 ```sh
 npm pack
-dsh plugin --profile web add ./dsh-llm-ssh-tunnel-0.2.2.tgz
+dsh plugin --profile web add ./dsh-llm-ssh-tunnel-0.2.3.tgz
 ```
 
 The package ships a built `lib/`, including the browser bundle. Restart or refresh the Web UI after installing.
@@ -221,6 +221,8 @@ So capability facts resolve in this order, and the winning layer is recorded per
 4. the route `defaults`.
 
 The built-in table covers the chat families this deployment serves — DeepSeek V4 and its vision variants (1M context, 384k output, low/high/max reasoning), GLM 5.x, Grok 4.6, Kimi K, MiniMax M3, and Claude (200k). The families the test account could route all accepted image input; Grok 4.6 was listed but not routable for that account, so its modality is inherited from the GLM entry. `knownModels: false` disables the table.
+
+Reasoning levels are part of those facts. GPT-6 Astra, `gpt-6`, and GPT-6.1 Sol accept `low`, `medium`, `high`, `xhigh`, and `max` (the gateway rejects `none`/`minimal`). GPT-6 Sol, GPT-6 Luna, GPT-6.1 Terra, and the GPT-5.6 family accept `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, and `max`. The model picker shows exactly these options.
 
 The listing is also filtered: this route streams chat completions only, so image-generation, embedding, and speech ids (`gpt-image-*`, `*-embedding-*`, `whisper-*`, `flux-*`, …) are dropped instead of offered as choices that could only fail. The dropped count is logged. A configured `models` entry is never filtered — writing it is an explicit request.
 

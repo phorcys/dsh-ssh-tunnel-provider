@@ -77,6 +77,26 @@ const GLM: KnownModelFacts = {
   reasoningEfforts: OFF_EFFORTS,
 }
 
+/** GPT-6 Astra / 6.1 Sol reject "none" and "minimal" at the gateway. */
+const GPT_STRICT_EFFORTS: Record<string, string | null> = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  xhigh: 'xhigh',
+  max: 'max',
+}
+
+/** GPT-6 Sol / 6.1 Terra and the GPT-5.6 family accept every level. */
+const GPT_FULL_EFFORTS: Record<string, string | null> = {
+  off: 'none',
+  minimal: 'minimal',
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  xhigh: 'xhigh',
+  max: 'max',
+}
+
 /** Ordered rules; the first match decides. */
 const RULES: readonly KnownModelRule[] = [
   {
@@ -101,6 +121,21 @@ const RULES: readonly KnownModelRule[] = [
     family: 'grok-4.6',
     matches: id => /(^|\/)grok-4\.6(\b|$)/.test(id),
     facts: GLM,
+  },
+  {
+    family: 'gpt-6 astra',
+    matches: id => id === 'gpt-6' || id === 'gpt-6-astra' || id === 'gpt-6.1-sol',
+    facts: { reasoningEfforts: GPT_STRICT_EFFORTS },
+  },
+  {
+    family: 'gpt-6 sol',
+    matches: id => id === 'gpt-6-sol' || id === 'gpt-6-luna' || id === 'gpt-6.1-terra',
+    facts: { reasoningEfforts: GPT_FULL_EFFORTS },
+  },
+  {
+    family: 'gpt-5.6',
+    matches: id => /(^|\/)gpt-5\.6(\b|$)/.test(id),
+    facts: { reasoningEfforts: GPT_FULL_EFFORTS },
   },
   {
     family: 'claude',

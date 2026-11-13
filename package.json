@@ -1,6 +1,6 @@
 {
   "name": "dsh-llm-ssh-tunnel",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "SSH-tunnelled multi-protocol model provider for DeepSeek Harness",
   "keywords": [
     "dsh-plugin",

@@ -54,7 +54,7 @@ dsh plugin --profile web add link:$PWD
 
 ```sh
 npm pack
-dsh plugin --profile web add ./dsh-llm-ssh-tunnel-0.2.2.tgz
+dsh plugin --profile web add ./dsh-llm-ssh-tunnel-0.2.3.tgz
 ```
 
 包内已经包含构建好的 `lib/`（包括浏览器 bundle）。安装后重启或刷新 Web UI。
@@ -220,6 +220,8 @@ sub2api 的 `/v1/models` 只返回 `{id, type, display_name, created_at}`，没�
 4. 路由的 `defaults`。
 
 内置表覆盖这套部署实际在用的 chat 家族——DeepSeek V4 及其视觉变体（1M 上下文、384k 输出、low/high/max 推理）、GLM 5.x、Grok 4.6、Kimi K、MiniMax M3，以及 Claude（200k）。测试账号能路由到的家族都实测接受图片输入；Grok 4.6 只在列表里出现、该账号无法路由，因此它的模态沿用 GLM 条目。`knownModels: false` 可以关掉它。
+
+推理档位也是这些事实的一部分。GPT-6 Astra、`gpt-6`、GPT-6.1 Sol 接受 `low`、`medium`、`high`、`xhigh`、`max`（网关拒绝 `none`/`minimal`）；GPT-6 Sol、GPT-6 Luna、GPT-6.1 Terra 和 GPT-5.6 家族额外接受 `off`、`minimal`。模型选择器会显示对应的选项。
 
 列表还会做过滤：这条路由只做 chat completions，所以图片生成、embedding、语音类 id（`gpt-image-*`、`*-embedding-*`、`whisper-*`、`flux-*` 等）会被丢弃，而不是放进选择器让人选了必然失败。丢弃数量会写进日志。显式写在 `models` 里的条目不会被过滤——那是明确的请求。
 

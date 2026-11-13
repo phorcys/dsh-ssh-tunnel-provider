@@ -471,3 +471,29 @@ test('all advertised DeepSeek V4.1 Flash spellings collapse to one entry', async
   // Six aliases plus the retired id.
   assert.equal(dropped.length, 7)
 })
+
+test('GPT-6 reasoning levels follow the gateway-accepted sets', async () => {
+  const { ModelCatalog, lookupKnownModel, resolveConfig, readConfig, Config } = await import('../lib/index.js')
+  const strict = Object.keys(lookupKnownModel('gpt-6.1-sol').facts.reasoningEfforts ?? {})
+  assert.deepEqual(strict, ['low', 'medium', 'high', 'xhigh', 'max'])
+  assert.deepEqual(
+    Object.keys(lookupKnownModel('gpt-6-astra').facts.reasoningEfforts ?? {}),
+    strict,
+  )
+  assert.deepEqual(
+    Object.keys(lookupKnownModel('gpt-6-sol').facts.reasoningEfforts ?? {}),
+    ['off', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
+  )
+  assert.deepEqual(
+    Object.keys(lookupKnownModel('gpt-5.6-terra').facts.reasoningEfforts ?? {}),
+    ['off', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
+  )
+
+  const config = resolveConfig(readConfig(Config({ ssh: { host: 'nas' }, remote: { port: 8080 }, models: [] })))
+  const catalog = new ModelCatalog(config)
+  catalog.setDiscovered([{ id: 'gpt-6-astra' }, { id: 'gpt-6.1-sol' }])
+  for (const model of catalog.models()) {
+    assert.equal(model.family, 'gpt-6 astra')
+    assert.deepEqual(Object.keys(model.reasoningEfforts ?? {}), ['low', 'medium', 'high', 'xhigh', 'max'])
+  }
+})
