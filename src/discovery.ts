@@ -252,7 +252,7 @@ export async function discoverModels(options: DiscoverModelsOptions): Promise<Di
   if (models.length === 0) {
     throw new LlmError(
       `ssh-tunnel: ${options.baseUrl}/models advertised no models; configure "models" explicitly`,
-      'NO_MODELS',
+      'DISCOVERY_FAILED',
     )
   }
   return models

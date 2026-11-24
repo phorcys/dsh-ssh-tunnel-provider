@@ -12,7 +12,7 @@ DSH  ──►  127.0.0.1:<临时端口>  ──ssh2──►  NAS 127.0.0.1:808
 
 对 DSH 来说，这就是一个普通的 `LlmAdapter`：模型选择、工具调用、图片、回放、推理等级、token 统计、重试都和别的 provider 一样。OpenAI / Anthropic 协议转换直接复用 `@deepseek-ai/dsh-llm-pi-ai` 的公开 `PiAiAdapter`。
 
-已在 DSH 0.2.1-rc.5 + 真实 sub2api 上验证：发现、流式输出、三种协议和图片输入都走通了隧道。自动化测试使用进程内 `ssh2.Server`，不需要 NAS 凭据，也不需要系统 `ssh`。
+已在 DSH 0.2.3-alpha.2 + 真实 sub2api 上验证：发现、流式输出、三种协议和图片输入都走通了隧道。自动化测试使用进程内 `ssh2.Server`，不需要 NAS 凭据，也不需要系统 `ssh`。
 
 ## 项目状态
 
@@ -20,7 +20,7 @@ DSH  ──►  127.0.0.1:<临时端口>  ──ssh2──►  NAS 127.0.0.1:808
 
 ## 环境要求
 
-- DeepSeek Harness `0.2.1-rc.5` 或兼容版本
+- DeepSeek Harness `0.2.3-alpha.2` 或兼容版本
 - Node.js `^22.19.0` 或 `>=24.0.0`
 - 设置卡片需要 Web profile；模型路由本身不依赖它
 - 一个能访问 sub2api 回环监听的 SSH 账号
@@ -54,7 +54,7 @@ dsh plugin --profile web add link:$PWD
 
 ```sh
 npm pack
-dsh plugin --profile web add ./dsh-llm-ssh-tunnel-0.2.3.tgz
+dsh plugin --profile web add ./dsh-llm-ssh-tunnel-0.2.4.tgz
 ```
 
 包内已经包含构建好的 `lib/`（包括浏览器 bundle）。安装后重启或刷新 Web UI。
@@ -262,7 +262,7 @@ models:
 - `apply()` 分配一个回环端口，注册一个 `LlmAdapter` 路由，并启动 `SshTunnel`。
 - `SshTunnel` 持有一个 `ssh2.Client` 和一个本地 TCP server。每个本地连接通过 `direct-tcpip` 打开到 `remote.host:remote.port` 的通道，然后双向 pipe。
 - 就绪判断是真的通过转发建立一次 TCP 连接，而不是只看 SSH client 还活着。连接断开后按指数退避重连（1 秒 → 30 秒）。
-- 重连期间到达的请求最多等 `requestTimeoutSeconds`，超时后以 `TUNNEL_UNAVAILABLE` 失败。
+- 重连期间到达的请求最多等 `requestTimeoutSeconds`，超时后以 `TRANSPORT` 失败。
 - 主机密钥按 `known_hosts` 校验；`accept-new` 首次连接后固定，后续密钥变化会被拒绝。
 - 设置卡片只访问一个回环、带进程内 token 的路由（`/plugins/dsh-llm-ssh-tunnel/config`）。token 由同源页面获取；跨源 POST 或缺少 token 的请求会被拒绝。
 - 连接参数变化时只重启隧道；模型/参数变化时重建目录和 profile。provider 路由本身不会注销。
@@ -279,7 +279,7 @@ models:
 
 ## 排错
 
-**`TUNNEL_UNAVAILABLE`**
+**`TRANSPORT`**
 在设置卡片里检查 host/port/user/key，并看 DSH 日志。虽然插件不用系统 ssh，手工做一次连通性检查仍然有用：
 
 ```sh
@@ -302,7 +302,7 @@ ssh -i ~/.ssh/id_ed25519 deploy@nas.example true
 浏览器半边只在 Web profile 里加载。确认包已安装到 profile，重启 `dsh web`，再看 **Settings → Plugins**。Host provider 在没有卡片时也能工作，只是没有 UI。
 
 **`dsh` 版本比插件旧**
-这个包面向 DSH `0.2.1-rc.5`；`0.2.1-rc.2` 这类旧 CLI 可能能组合 profile，却在启动时跳过插件。检查 `command -v dsh` 和 `dsh --version`，更新或重新指向全局 CLI，然后重启 Web 进程。正在运行的进程不会自动换版本。
+这个包面向 DSH `0.2.3-alpha.2`；`0.2.1-rc.2` 这类旧 CLI 可能能组合 profile，却在启动时跳过插件。检查 `command -v dsh` 和 `dsh --version`，更新或重新指向全局 CLI，然后重启 Web 进程。正在运行的进程不会自动换版本。
 
 **模型显示 262k 上下文、输出很短、或没有图片支持**
 说明这个模型落到了路由默认值上，因为 sub2api 没有公布任何容量信息。检查 DSH 日志里的 `model facts — … from built-in families` 和 `N model(s) use route defaults` 警告；然后在 `models` 里声明它的 `contextWindow`、`maxTokens`、`input`。内置表里已收录的家族不用手动写。

@@ -11,8 +11,11 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-credentials'
-import { assertUsableApiKey, LlmError } from '@deepseek-ai/dsh-llm'
+import { INVALID_CREDENTIAL_CODE, LlmError } from '@deepseek-ai/dsh-llm'
 import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
+
+/** Characters an HTTP header can carry; the same rule the newer harness uses. */
+const LEGAL_API_KEY = /^[\x21-\x7E]+$/
 
 /** The credential seam's minimal shape, kept local so the plugin loads without it. */
 interface CredentialResolver {
@@ -69,5 +72,19 @@ export async function resolveSecret(
  */
 export async function resolveApiKey(ctx: Context, ref: string | undefined): Promise<string | undefined> {
   const value = await resolveSecret(ctx, ref, 'model API key')
-  return value === undefined ? undefined : assertUsableApiKey(value, 'ssh-tunnel', ref ?? '')
+  if (value === undefined) return undefined
+  const trimmed = value.trim()
+  if (trimmed.length === 0) {
+    throw new LlmError(
+      `ssh-tunnel: the model API key resolved from "${ref ?? ''}" is blank; set the reference to the raw key`,
+      INVALID_CREDENTIAL_CODE,
+    )
+  }
+  if (!LEGAL_API_KEY.test(trimmed)) {
+    throw new LlmError(
+      `ssh-tunnel: the model API key resolved from "${ref ?? ''}" contains characters no HTTP header can carry; set the reference to the raw key alone`,
+      INVALID_CREDENTIAL_CODE,
+    )
+  }
+  return trimmed
 }

@@ -61,7 +61,7 @@ export declare class SshTunnel {
      * Wait until a fresh forward accepts a connection.
      * @param timeoutMs - maximum wait; the caller's request budget.
      * @param signal - request cancellation.
-     * @throws LlmError `TUNNEL_UNAVAILABLE` when no forward is ready in time.
+     * @throws LlmError `TRANSPORT` when no forward is ready in time.
      */
     ensureReady(timeoutMs: number, signal?: AbortSignal): Promise<void>;
     /** Stop supervision and close both the listener and the SSH transport. */

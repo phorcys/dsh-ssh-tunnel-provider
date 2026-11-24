@@ -10,6 +10,7 @@ import {
   Config,
   KnownHosts,
   discoverModels,
+  resolveApiKey,
   parseModelList,
   readConfig,
   reasoningFields,
@@ -495,5 +496,28 @@ test('GPT-6 reasoning levels follow the gateway-accepted sets', async () => {
   for (const model of catalog.models()) {
     assert.equal(model.family, 'gpt-6 astra')
     assert.deepEqual(Object.keys(model.reasoningEfforts ?? {}), ['low', 'medium', 'high', 'xhigh', 'max'])
+  }
+})
+
+
+test('resolveApiKey trims a usable key and rejects header-illegal values', async () => {
+  const ctx = { get: () => undefined }
+  process.env.SSH_TUNNEL_TEST_KEY = '  sk-test  '
+  try {
+    assert.equal(await resolveApiKey(ctx, 'SSH_TUNNEL_TEST_KEY'), 'sk-test')
+  } finally {
+    delete process.env.SSH_TUNNEL_TEST_KEY
+  }
+  process.env.SSH_TUNNEL_TEST_KEY = '   '
+  try {
+    await assert.rejects(resolveApiKey(ctx, 'SSH_TUNNEL_TEST_KEY'), /is blank/)
+  } finally {
+    delete process.env.SSH_TUNNEL_TEST_KEY
+  }
+  process.env.SSH_TUNNEL_TEST_KEY = 'bad\nkey'
+  try {
+    await assert.rejects(resolveApiKey(ctx, 'SSH_TUNNEL_TEST_KEY'), /no HTTP header/)
+  } finally {
+    delete process.env.SSH_TUNNEL_TEST_KEY
   }
 })

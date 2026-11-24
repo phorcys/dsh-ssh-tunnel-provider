@@ -12,7 +12,7 @@ DSH  ──►  127.0.0.1:<ephemeral>  ──ssh2──►  NAS 127.0.0.1:8080  
 
 The route is a normal `LlmAdapter`: model selection, tools, images, replay, reasoning effort, token accounting, and retries behave the same as any other DSH provider. The OpenAI and Anthropic wire conversions are reused from the public `@deepseek-ai/dsh-llm-pi-ai` adapter.
 
-Verified with DSH 0.2.1-rc.5 against a live sub2api deployment: discovery, streaming, all three wire protocols, and image input round-tripped through the tunnel. The automated suite uses an in-process `ssh2` server, so it needs no NAS credentials and no system `ssh`.
+Verified with DSH 0.2.3-alpha.2 against a live sub2api deployment: discovery, streaming, all three wire protocols, and image input round-tripped through the tunnel. The automated suite uses an in-process `ssh2` server, so it needs no NAS credentials and no system `ssh`.
 
 ## Project status
 
@@ -20,7 +20,7 @@ Verified with DSH 0.2.1-rc.5 against a live sub2api deployment: discovery, strea
 
 ## Requirements
 
-- DeepSeek Harness `0.2.1-rc.5` or a compatible build
+- DeepSeek Harness `0.2.3-alpha.2` or a compatible build
 - Node.js `^22.19.0` or `>=24.0.0`
 - A Web profile for the settings card; the model route works without it
 - An SSH account that can reach sub2api's loopback listener
@@ -55,7 +55,7 @@ Or pack it and install the tarball:
 
 ```sh
 npm pack
-dsh plugin --profile web add ./dsh-llm-ssh-tunnel-0.2.3.tgz
+dsh plugin --profile web add ./dsh-llm-ssh-tunnel-0.2.4.tgz
 ```
 
 The package ships a built `lib/`, including the browser bundle. Restart or refresh the Web UI after installing.
@@ -261,7 +261,7 @@ The deployment lists `deepseek-v4-flash`, `deepseek-v4.1-flash`, `deepseek-v4.1-
 - `apply()` allocates a loopback port, registers one `LlmAdapter` route, and starts an `SshTunnel`.
 - `SshTunnel` owns one `ssh2.Client` and one local TCP server. Each accepted connection opens a `direct-tcpip` channel to `remote.host:remote.port` and pipes the sockets.
 - Readiness is a real TCP connection through the forward, not just a live SSH client. A dropped connection closes the listener and reconnects with exponential backoff (1s → 30s).
-- A request that arrives during a reconnect waits up to `requestTimeoutSeconds`, then fails with `TUNNEL_UNAVAILABLE`.
+- A request that arrives during a reconnect waits up to `requestTimeoutSeconds`, then fails with `TRANSPORT`.
 - Host keys are checked against `known_hosts`; `accept-new` pins an unknown host after the first successful connection. A changed key is refused.
 - The settings card talks to one loopback-only, token-guarded route (`/plugins/dsh-llm-ssh-tunnel/config`). The token is fetched by the same-origin page; the route rejects cross-origin POSTs and requests without the token.
 - Connection settings are applied live: an SSH/remote change restarts only the forward; a model/knob change rebuilds the catalog/profile. The provider route is never unregistered.
@@ -278,7 +278,7 @@ The deployment lists `deepseek-v4-flash`, `deepseek-v4.1-flash`, `deepseek-v4.1-
 
 ## Troubleshooting
 
-**`TUNNEL_UNAVAILABLE`**
+**`TRANSPORT`**
 Check the host/port/user/key in the settings card and the DSH log. A quick sanity check with the system client is useful even though the plugin does not use it:
 
 ```sh
@@ -301,7 +301,7 @@ Use a normal path such as `C:\Users\me\.ssh\id_ed25519`. `agent: true` tries Pag
 The browser half is loaded only in the Web profile. Confirm the package is installed in the profile, restart `dsh web`, and check **Settings → Plugins**. The host provider works without the card; only the UI is absent.
 
 **`dsh` is an older build than the plugin**
-This package targets DSH `0.2.1-rc.5`; an older CLI such as `0.2.1-rc.2` can make the profile compose but skip the plugin at boot. Check `command -v dsh` and `dsh --version`, then update or repoint the global CLI and restart the Web process. The running process keeps the version it was started with.
+This package targets DSH `0.2.3-alpha.2`; an older CLI such as `0.2.1-rc.2` can make the profile compose but skip the plugin at boot. Check `command -v dsh` and `dsh --version`, then update or repoint the global CLI and restart the Web process. The running process keeps the version it was started with.
 
 **A model shows 262k context, short output, or no image support**
 That model fell through to the route defaults, because sub2api publishes no capacities. Check the DSH log line `model facts — … from built-in families` and the `N model(s) use route defaults` warning; declare the model under `models` with `contextWindow`, `maxTokens`, and `input`. Families listed in the built-in table are already handled.

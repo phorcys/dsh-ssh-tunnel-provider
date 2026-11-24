@@ -161,7 +161,7 @@ export class SshTunnel {
    * Wait until a fresh forward accepts a connection.
    * @param timeoutMs - maximum wait; the caller's request budget.
    * @param signal - request cancellation.
-   * @throws LlmError `TUNNEL_UNAVAILABLE` when no forward is ready in time.
+   * @throws LlmError `TRANSPORT` when no forward is ready in time.
    */
   async ensureReady(timeoutMs: number, signal?: AbortSignal): Promise<void> {
     if (this.isReady) {
@@ -171,7 +171,7 @@ export class SshTunnel {
       if (await probePort(this.port)) return
       this.markDown('readiness probe failed')
     }
-    if (this.stopped) throw new LlmError('ssh-tunnel: tunnel is stopped', 'TUNNEL_UNAVAILABLE')
+    if (this.stopped) throw new LlmError('ssh-tunnel: tunnel is stopped', 'TRANSPORT')
     this.start()
 
     const deadline = Date.now() + timeoutMs
@@ -187,7 +187,7 @@ export class SshTunnel {
     throw new LlmError(
       `ssh-tunnel: no SSH forward to ${this.config.ssh.host}:${this.config.ssh.port} after ${timeoutMs}ms`
       + (this.lastErrorText === undefined ? '' : ` (${this.lastErrorText})`),
-      'TUNNEL_UNAVAILABLE',
+      'TRANSPORT',
     )
   }
 

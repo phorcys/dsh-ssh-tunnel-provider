@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4
+
+- Support DSH `0.2.3-alpha.2`: replace the removed `assertUsableApiKey` helper
+  with local API-key validation, update the image-policy profile fields, and
+  use the renamed discovery/transport failure codes.
+
 ## 0.2.3
 
 - Add GPT-6 Astra / 6.1 Sol reasoning levels (`low`, `medium`, `high`,
